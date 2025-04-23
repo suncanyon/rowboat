@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  supergateway:
+    container_name: github-mcp-gateway
+    build:
+      context: .
+      dockerfile: dockerfile/supergateway.docker.yml
+    ports:
+      - "4001:4001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      supergateway
+      --stdio "docker run --rm -i
+      -e GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_PERSONAL_ACCESS_TOKEN}
+      -e GITHUB_TOOLSETS=${GITHUB_TOOLSETS}
+      ghcr.io/github/github-mcp-server"
+      --port 4001
+      --baseUrl http://host.docker.internal:4001
+      --ssePath /sse
+      --messagePath /message
+
+  supergateway-slack:
+    container_name: slack-mcp-gateway
+    image: supercorp/supergateway
+    ports:
+      - "4002:4002"
+    environment:
+      - SLACK_BOT_TOKEN=${SLACK_BOT_USER_OAUTH_TOKEN}
+      - SLACK_TEAM_ID=${SLACK_TEAM_ID}
+    volumes:
+      - .:/app
+    working_dir: /app
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      --stdio "npx -y @modelcontextprotocol/server-slack"
+      --port 4002
+      --baseUrl http://host.docker.internal:4002
+      --ssePath /sse
+      --messagePath /message

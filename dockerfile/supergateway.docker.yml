@@ -1,0 +1,10 @@
+FROM docker:cli
+
+# Install Node + NPM (or use node:XX-alpine if easier)
+RUN apk add --no-cache nodejs npm
+
+# Install supergateway globally
+RUN npm install -g supergateway
+
+# Default command
+CMD ["supergateway"]

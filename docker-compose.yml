@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - MONGODB_CONNECTION_STRING=mongodb://mongo:27017/rowboat
@@ -37,6 +39,8 @@ services:
       - MAX_QUERIES_PER_MINUTE=${MAX_QUERIES_PER_MINUTE}
       - MAX_PROJECTS_PER_USER=${MAX_PROJECTS_PER_USER}
       - VOICE_API_URL=${VOICE_API_URL}
+      - EXTERNAL_SERVICE_4001_URL=http://host.docker.internal:4001
+      - EXTERNAL_SERVICE_4002_URL=http://host.docker.internal:4002
     restart: unless-stopped
 
   rowboat_agents:
@@ -45,6 +49,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - API_KEY=${AGENTS_API_KEY}
