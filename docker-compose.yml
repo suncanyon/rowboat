@@ -39,8 +39,6 @@ services:
       - MAX_QUERIES_PER_MINUTE=${MAX_QUERIES_PER_MINUTE}
       - MAX_PROJECTS_PER_USER=${MAX_PROJECTS_PER_USER}
       - VOICE_API_URL=${VOICE_API_URL}
-      - EXTERNAL_SERVICE_4001_URL=http://host.docker.internal:4001
-      - EXTERNAL_SERVICE_4002_URL=http://host.docker.internal:4002
     restart: unless-stopped
 
   rowboat_agents:

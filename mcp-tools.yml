@@ -46,3 +46,85 @@ services:
       --baseUrl http://host.docker.internal:4002
       --ssePath /sse
       --messagePath /message
+
+  supergateway-filesystem:
+    container_name: filesystem-mcp-gateway
+    image: supercorp/supergateway
+    ports:
+      - "4003:4003"
+    volumes:
+      - .:/code
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      --stdio "npx -y @modelcontextprotocol/server-filesystem /code"
+      --port 4003
+      --baseUrl http://host.docker.internal:4003
+      --ssePath /sse
+      --messagePath /message
+
+  supergateway-notion:
+    container_name: notion-mcp-gateway
+    image: supercorp/supergateway
+    ports:
+      - "4004:4004"
+    environment:
+      OPENAPI_MCP_HEADERS: '{"Authorization": "Bearer ${NOTION_API_TOKEN}", "Notion-Version": "2022-06-28"}'
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      --stdio "npx -y @notionhq/notion-mcp-server"
+      --port 4004
+      --baseUrl http://host.docker.internal:4004
+      --ssePath /sse
+      --messagePath /message
+
+
+  supergateway-atlassian:
+    container_name: atlassian-mcp-gateway
+    image: supercorp/supergateway
+    ports:
+      - "4005:4005"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      --stdio "docker run -i --rm
+      -e CONFLUENCE_URL=${CONFLUENCE_URL:-https://your-company.atlassian.net/wiki}
+      -e CONFLUENCE_USERNAME=${CONFLUENCE_USERNAME:-your.email@company.com}
+      -e CONFLUENCE_API_TOKEN=${ATLASSIAN_API_KEY}
+      -e JIRA_URL=${JIRA_URL:-https://your-company.atlassian.net}
+      -e JIRA_USERNAME=${JIRA_USERNAME:-your.email@company.com}
+      -e JIRA_API_TOKEN=${ATLASSIAN_API_KEY}
+      ghcr.io/sooperset/mcp-atlassian:latest"
+      --port 4005
+      --baseUrl http://host.docker.internal:4005
+      --ssePath /sse
+      --messagePath /message
+
+  # supergateway-trello:
+  #   container_name: trello-mcp-gateway
+  #   image: supercorp/supergateway
+  #   ports:
+  #     - "4005:4005"
+  #   environment:
+  #     - TRELLO_API_KEY=${TRELLO_API_KEY}
+  #     - TRELLO_TOKEN=${TRELLO_TOKEN}
+  #     - TRELLO_BOARD_ID=${TRELLO_BOARD_ID}
+  #   env_file:
+  #     - .env
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   command: >
+  #     --stdio "npx -y @modelcontextprotocol/server-trello"
+  #     --port 4005
+  #     --baseUrl http://host.docker.internal:4005
+  #     --ssePath /sse
+  #     --messagePath /message
